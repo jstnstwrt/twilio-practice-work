@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
 import sqlalchemy.exc
-from db_setup import Base, Message, Call
+from db_setup import Base, Message, Call, John
 
 engine = create_engine('sqlite:///john.db')
 Base.metadata.bind = engine
@@ -36,6 +36,18 @@ def store_call(call):
 		db_session.add(newCall)
 		db_session.commit()
 		print "succesfully added call!"
+	except sqlalchemy.exc.IntegrityError:
+		print "IntegrityError"
+		db_session.rollback()
+    	# db_session.close()
+
+
+def store_john(john_number):
+	newJohn = John(	number = john_number)
+	try:
+		db_session.add(newJohn)
+		db_session.commit()
+		print "succesfully added john!"
 	except sqlalchemy.exc.IntegrityError:
 		print "IntegrityError"
 		db_session.rollback()

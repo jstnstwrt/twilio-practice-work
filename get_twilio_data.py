@@ -1,6 +1,7 @@
 from config import * 
 from twilio.rest import TwilioRestClient
-from models import store_call, store_message
+from models import store_call, store_message, store_john
+from db_setup import John
 
 # Configuration
 # Account Sid and Auth Token from twilio.com/user/account
@@ -16,8 +17,10 @@ calls = client.calls.list()
 
 for m in messages:
 	store_message(m)
+	store_john(m.from_)
 
 for c in calls:
 	store_call(c)
+	store_john(c.from_)
 
 
