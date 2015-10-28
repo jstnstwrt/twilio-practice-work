@@ -13,6 +13,8 @@ class John(Base):
 	id = Column( Integer, primary_key = True)
 	number = Column( String(80), unique = True , nullable = False)
 	location =  Column(String(180))
+	call_count = Column( Integer)
+	message_count = Column( Integer)
 
 	calls = relationship("Call")
 	messages = relationship("Message")
