@@ -1,6 +1,6 @@
 from config import * 
 from twilio.rest import TwilioRestClient
-from models import store_call,  store_john, does_john_exist, update_john_message_count
+from models import store_call,  store_message, does_john_exist, update_john_message_count
 from db_setup import John
 
 # Configuration
@@ -16,9 +16,8 @@ calls = client.calls.list()
 #http://twilio-python.readthedocs.org/en/latest/usage/messages.html
 
 for m in messages:
-	update_john_message_count(m.from_)
+	store_message(m)
 
-# for c in calls:
-# 	store_call(c)
-
+for c in calls:
+	store_call(c)
 

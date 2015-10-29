@@ -13,18 +13,27 @@ db_session = DBSession()
 
 def does_john_exist(number):
 	(ret, ), = db_session.query(exists().where(John.number==number))
-	print ret
+	return ret
 
+
+## this is working for the mooment, but needs to be done more elegantly.
+## need to store initallized values for call count and message count
 def store_john(response):
-		newJohn = John(	number =  response.from_ , message_count = 0, call_count = 0)
-		try:
-			db_session.add(newJohn)
-			db_session.commit()
-			print "succesfully added john!"
-		except sqlalchemy.exc.IntegrityError:
-			print "IntegrityError"
-			db_session.rollback()
-	    	# db_session.close()
+	if response.__class__ == "<class 'twilio.rest.resources.messages.Message'>":
+		message_count = 1
+		call_count = 0
+	else:
+		message_count = 0
+		call_count = 1
+	newJohn = John(	number =  response.from_ , message_count = message_count, call_count = call_count)
+	try:
+		db_session.add(newJohn)
+		db_session.commit()
+		print "succesfully added john!"
+	except sqlalchemy.exc.IntegrityError:
+		print "IntegrityError"
+		db_session.rollback()
+    	# db_session.close()
 
 
 def update_john_message_count(number):
@@ -51,12 +60,11 @@ def store_message(message):
 							direction = message.direction)
 	try:
 		db_session.add(newMessage)
-		if does_john_exist:
+		if does_john_exist(newMessage.from_number):
 			update_john_message_count(newMessage.from_number)
 		else:
 			store_john(message)
 		db_session.commit()
-		print "succesfully added message!"
 	except sqlalchemy.exc.IntegrityError:
 		print "IntegrityError"
 		db_session.rollback()
@@ -71,8 +79,8 @@ def store_call(call):
 					direction = call.direction)
 	try:
 		db_session.add(newCall)
-		if does_john_exist:
-			update_john_message_count(newCall.from_number)
+		if does_john_exist(newCall.from_number):
+			update_john_call_count(newCall.from_number)
 		else:
 			store_john(call)
 		db_session.commit()
